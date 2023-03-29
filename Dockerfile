@@ -12,6 +12,7 @@ RUN npm run build
 
 FROM ${NGINX_IMAGE} AS web-server
 ARG NODE_ENV=production
+ARG WORKDIR=/usr/src/app
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=web-build ${WORKDIR}/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf

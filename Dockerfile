@@ -1,7 +1,7 @@
 ARG NODE_IMAGE=node:16
 ARG NGINX_IMAGE=nginx:latest
 ARG PORT=3000
-ARG WORKDIR=/usr/src/app/
+ARG WORKDIR=/usr/src/app
 
 FROM ${NODE_IMAGE} AS web-build 
 WORKDIR ${WORKDIR}
@@ -12,7 +12,6 @@ RUN npm run build
 
 FROM ${NGINX_IMAGE} AS web-server
 ARG NODE_ENV=production
-ARG WORKDIR=/usr/src/app
 ENV NODE_ENV=${NODE_ENV}
 RUN mkdir -p /usr/share/nginx/buffer
 COPY --from=web-build ${WORKDIR}/.next /usr/share/nginx/buffer

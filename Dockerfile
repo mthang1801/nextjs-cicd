@@ -1,19 +1,25 @@
 ARG NODE_IMAGE=node:16
 ARG NGINX_IMAGE=nginx:latest
 ARG PORT=3000
+ARG WORKDIR=/usr/src/app/
 
 FROM ${NODE_IMAGE} AS web-build 
-WORKDIR /usr/src/app
+WORKDIR ${WORKDIR}
 COPY package.json .
 RUN npm install --force
 COPY . .
 RUN npm run build
-RUN ls -la
 
 FROM ${NGINX_IMAGE} AS web-server
 ARG NODE_ENV=production
 ARG WORKDIR=/usr/src/app
 ENV NODE_ENV=${NODE_ENV}
-COPY --from=web-build /usr/src/app/build /usr/share/nginx/html
+RUN mkdir -p /usr/share/nginx/buffer
+COPY --from=web-build ${WORKDIR}/.next /usr/share/nginx/buffer
+COPY --from=web-build ${WORKDIR}/deploy.sh /usr/share/nginx/buffer
+RUN chmod +x /usr/share/nginx/buffer/deploy.sh
+RUN cd /usr/share/nginx/buffer && ./deploy.sh
+RUN mkdir /usr/share/nginx/log
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE ${PORT}
+CMD ["nginx", "-g", "daemon off;"]

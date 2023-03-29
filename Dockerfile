@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package.json .
 RUN npm install --force
 COPY . .
-RUN npm run build
+RUN npx prisma db seed && npm run build
 
 FROM ${NGINX_IMAGE} AS web-server
 ARG NODE_ENV=production

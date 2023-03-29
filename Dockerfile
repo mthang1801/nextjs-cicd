@@ -1,6 +1,6 @@
 ARG NODE_IMAGE=node:16
 ARG NGINX_IMAGE=nginx:latest
-ARG PORT=3000
+ARG PORT=80
 ARG WORKDIR=/usr/src/app
 
 FROM ${NODE_IMAGE} AS web-build 

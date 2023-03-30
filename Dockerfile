@@ -11,11 +11,11 @@ RUN npm run build
 FROM ${NODE_IMAGE} AS web-server
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+RUN sudo addgroup -g 1001 -S nodejs
+RUN sudo adduser -S nextjs -u 1001
 COPY --from=web-build --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
 COPY --from=web-build --chown=nextjs:nodejs /usr/src/app/.next/static ./.next/static
 USER nextjs
-EXPOSE 3000
-ENV PORT 3000
+ENV PORT=3000
+EXPOSE ${PORT}
 CMD ["node", "server.js"]

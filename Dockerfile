@@ -8,10 +8,14 @@ RUN npm install --force
 COPY . .
 RUN npm run build
 
-FROM ${NGINX_IMAGE} AS web-server
+FROM ${NODE_IMAGE} AS web-server
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-COPY --from=web-build /usr/src/app/.next /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+COPY --from=web-build --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
+COPY --from=web-build --chown=nextjs:nodejs /usr/src/app/.next/static ./.next/static
+USER nextjs
+EXPOSE 3000
+ENV PORT 3000
+CMD ["node", "server.js"]
